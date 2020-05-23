@@ -6,36 +6,21 @@ type FractalOptions = {
     depth: number;
 };
 
-function left(options: FractalOptions): void {
+function leaf(options: FractalOptions, direction: -1 | 1): void {
     const size: number = options.size / 2 / Math.cos(options.rotate);
-    console.log(options.size / 2, size);
+
+    let x: number = 0;
+    let y: number = options.size;
+
+    if (direction === -1) {
+        x = options.size / 2;
+        y = options.size + size * Math.sin(options.rotate);
+    }
 
     options.ctx.save();
     options.ctx.setTransform(options.transform);
-    options.ctx.translate(0, options.size);
-    options.ctx.rotate(options.rotate);
-
-    const transform: DOMMatrix = options.ctx.getTransform();
-
-    options.ctx.restore();
-
-    fractal({
-        ctx: options.ctx,
-        size,
-        depth: options.depth + 1,
-        rotate: options.rotate,
-        transform,
-    });
-}
-
-function right(options: FractalOptions): void {
-    const size: number = options.size / 2 / Math.cos(options.rotate);
-    const yOffset: number = size * Math.sin(options.rotate);
-
-    options.ctx.save();
-    options.ctx.setTransform(options.transform);
-    options.ctx.translate(options.size / 2, options.size + yOffset);
-    options.ctx.rotate(-options.rotate);
+    options.ctx.translate(x, y);
+    options.ctx.rotate(options.rotate * direction);
 
     const transform: DOMMatrix = options.ctx.getTransform();
 
@@ -61,7 +46,7 @@ export function fractal(options: FractalOptions): void {
     options.ctx.restore();
 
     if (options.depth < 6) {
-        left(options);
-        right(options);
+        leaf(options, 1);
+        leaf(options, -1);
     }
 }
